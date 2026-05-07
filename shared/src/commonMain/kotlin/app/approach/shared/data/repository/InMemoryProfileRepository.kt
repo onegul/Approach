@@ -9,14 +9,17 @@ import kotlinx.coroutines.flow.asStateFlow
 class InMemoryProfileRepository(
     initialProfile: UserProfile? = null
 ) : ProfileRepository {
-    private val _profile = MutableStateFlow(initialProfile)
-    override val profile: Flow<UserProfile?> = _profile.asStateFlow()
+    private val profile = MutableStateFlow(initialProfile)
+
+    override fun observeProfile(): Flow<UserProfile?> {
+        return profile.asStateFlow()
+    }
 
     override suspend fun saveProfile(profile: UserProfile) {
-        this._profile.value = profile
+        this.profile.value = profile
     }
 
     override suspend fun clearProfile() {
-        _profile.value = null
+        profile.value = null
     }
 }
