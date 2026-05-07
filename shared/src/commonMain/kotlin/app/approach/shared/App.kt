@@ -33,7 +33,17 @@ private fun AppContent() {
         .observeProfileUseCase()
         .collectAsStateWithLifecycle(initialValue = null)
 
-    if (profile == null)
+    val nearbyPeers by appContainer
+        .observeNearbyPeersUseCase()
+        .collectAsStateWithLifecycle(initialValue = emptyList())
+
+    val isBroadcasting by appContainer
+        .observeBroadcastingStateUseCase()
+        .collectAsStateWithLifecycle(initialValue = false)
+
+    val currentProfile = profile
+
+    if (currentProfile == null)
         ProfileSetupScreen(
             onSaveProfile = { profile ->
                 coroutineScope.launch {
@@ -42,5 +52,17 @@ private fun AppContent() {
             }
         )
     else
-        HomeScreen(profile = profile!!)
+        HomeScreen(
+            profile = currentProfile,
+            nearbyPeers = nearbyPeers,
+            isBroadcasting = isBroadcasting,
+            onBroadcastingChange = { shouldBroadcast ->
+                coroutineScope.launch {
+                    if (shouldBroadcast)
+                        appContainer.startBroadcastUseCase(currentProfile)
+                    else
+                        appContainer.stopBroadcastUseCase()
+                }
+            }
+        )
 }
