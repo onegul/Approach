@@ -1,23 +1,19 @@
 package app.approach.shared
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import app.approach.shared.core.designsystem.component.StatusPill
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.approach.shared.core.designsystem.theme.ApproachTheme
+import app.approach.shared.feature.home.HomeScreen
+import app.approach.shared.feature.profile.ProfileSetupScreen
+import kotlinx.coroutines.launch
 
 @Composable
 fun App(
-    appContainer: AppContainer = AppContainer()
+    appContainer: AppContainer = remember { AppContainer() }
 ) {
     CompositionLocalProvider(
         LocalAppContainer provides appContainer
@@ -30,28 +26,21 @@ fun App(
 
 @Composable
 private fun AppContent() {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            StatusPill(text = "Local-first")
+    val appContainer = LocalAppContainer.current
+    val coroutineScope = rememberCoroutineScope()
 
-            Text(
-                text = "Approach",
-                style = MaterialTheme.typography.headlineMedium
-            )
+    val profile by appContainer
+        .observeProfileUseCase()
+        .collectAsStateWithLifecycle(initialValue = null)
 
-            Text(
-                text = "Discover nearby people without internet.",
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-    }
+    if (profile == null)
+        ProfileSetupScreen(
+            onSaveProfile = { profile ->
+                coroutineScope.launch {
+                    appContainer.saveProfileUseCase(profile)
+                }
+            }
+        )
+    else
+        HomeScreen(profile = profile!!)
 }
