@@ -1,45 +1,24 @@
 package app.approach.shared.feature.home
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import app.approach.shared.core.designsystem.component.StatusPill
+import app.approach.shared.core.model.NearbyPeer
 import app.approach.shared.core.model.UserProfile
+import app.approach.shared.feature.discovery.DiscoveryScreen
+import app.approach.shared.feature.discovery.DiscoveryUiState
 
 @Composable
 fun HomeScreen(
     profile: UserProfile,
-    modifier: Modifier = Modifier
+    nearbyPeers: List<NearbyPeer>,
+    isBroadcasting: Boolean,
+    onBroadcastingChange: (Boolean) -> Unit
 ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize()
-    ) { contentPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding)
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            StatusPill(text = "Local profile active")
-
-            Text(
-                text = "Hi, ${profile.displayName}",
-                style = MaterialTheme.typography.headlineMedium
-            )
-
-            Text(
-                text = "Discovery screen comes next.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
+    DiscoveryScreen(
+        uiState = DiscoveryUiState(
+            profile = profile,
+            nearbyPeers = nearbyPeers,
+            isBroadcasting = isBroadcasting
+        ),
+        onBroadcastingChange = onBroadcastingChange
+    )
 }
