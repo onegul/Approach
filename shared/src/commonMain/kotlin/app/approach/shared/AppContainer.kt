@@ -5,6 +5,7 @@ import app.approach.shared.data.repository.InMemoryProfileRepository
 import app.approach.shared.domain.nearby.NearbyBroadcaster
 import app.approach.shared.domain.nearby.NearbyScanner
 import app.approach.shared.domain.repository.ProfileRepository
+import app.approach.shared.domain.usecase.ClearProfileUseCase
 import app.approach.shared.domain.usecase.ObserveBroadcastingStateUseCase
 import app.approach.shared.domain.usecase.ObserveNearbyPeersUseCase
 import app.approach.shared.domain.usecase.ObserveProfileUseCase
@@ -26,4 +27,5 @@ class AppContainer {
 
     val observeProfileUseCase = ObserveProfileUseCase(profileRepository)
     val saveProfileUseCase = SaveProfileUseCase(profileRepository)
+    val clearProfileUseCase = ClearProfileUseCase(profileRepository)
 }

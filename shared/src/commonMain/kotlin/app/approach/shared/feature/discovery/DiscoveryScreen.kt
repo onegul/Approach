@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import app.approach.shared.core.designsystem.component.ApproachOutlineButton
 import app.approach.shared.core.designsystem.component.StatusPill
 import app.approach.shared.core.model.DistanceHint
 import app.approach.shared.core.model.NearbyPeer
@@ -28,6 +29,7 @@ import app.approach.shared.core.model.NearbyPeer
 fun DiscoveryScreen(
     uiState: DiscoveryUiState,
     onBroadcastingChange: (Boolean) -> Unit,
+    onResetProfileClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -44,7 +46,8 @@ fun DiscoveryScreen(
                 DiscoveryHeader(
                     displayName = uiState.profile.displayName,
                     isBroadcasting = uiState.isBroadcasting,
-                    onBroadcastingChange = onBroadcastingChange
+                    onBroadcastingChange = onBroadcastingChange,
+                    onResetProfileClick = onResetProfileClick
                 )
             }
 
@@ -68,7 +71,8 @@ fun DiscoveryScreen(
 private fun DiscoveryHeader(
     displayName: String,
     isBroadcasting: Boolean,
-    onBroadcastingChange: (Boolean) -> Unit
+    onBroadcastingChange: (Boolean) -> Unit,
+    onResetProfileClick: () -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -86,6 +90,11 @@ private fun DiscoveryHeader(
             text = "Hi, $displayName. Choose when your public profile is visible to nearby people.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        ApproachOutlineButton(
+            text = "Reset profile",
+            onClick = onResetProfileClick
         )
 
         Card(
