@@ -63,6 +63,12 @@ private fun AppContent() {
                     else
                         appContainer.stopBroadcastUseCase()
                 }
+            },
+            onResetProfileClick = {
+                coroutineScope.launch {
+                    appContainer.stopBroadcastUseCase()
+                    appContainer.clearProfileUseCase()
+                }
             }
         )
 }
