@@ -3,8 +3,10 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kmp.library)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.room)
 }
 
 kotlin {
@@ -32,17 +34,29 @@ kotlin {
             implementation(libs.compose.foundation)
             implementation(libs.compose.ui)
             implementation(libs.compose.resources)
-            implementation(libs.compose.uiToolingPreview)
+            implementation(libs.compose.ui.tooling.preview)
             implementation(libs.compose.material3)
-            implementation(libs.lifecycle.viewmodelCompose)
-            implementation(libs.lifecycle.runtimeCompose)
+            implementation(libs.lifecycle.viewmodel.compose)
+            implementation(libs.lifecycle.runtime.compose)
+            implementation(libs.sqlite.bundled)
+            implementation(libs.room.runtime)
         }
         androidMain.dependencies {
-            api(libs.androidx.activity.compose)
-            implementation(libs.compose.uiToolingPreview)
+            api(libs.activity.compose)
+            implementation(libs.compose.ui.tooling.preview)
         }
         commonTest.dependencies {
 
         }
     }
+}
+
+dependencies {
+    add("kspAndroid", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }

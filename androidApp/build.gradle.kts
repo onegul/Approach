@@ -21,5 +21,5 @@ android {
 
 dependencies {
     implementation(project(":shared"))
-    implementation(libs.androidx.activity)
+    implementation(libs.activity)
 }
