@@ -13,8 +13,9 @@ import app.approach.shared.domain.usecase.SaveProfileUseCase
 import app.approach.shared.domain.usecase.StartBroadcastUseCase
 import app.approach.shared.domain.usecase.StopBroadcastUseCase
 
-class AppContainer {
-    private val profileRepository: ProfileRepository = InMemoryProfileRepository()
+class AppContainer(
+    profileRepository: ProfileRepository = InMemoryProfileRepository()
+) {
     private val nearbyDiscoveryEngine = FakeNearbyDiscoveryEngine()
 
     val nearbyScanner: NearbyScanner = nearbyDiscoveryEngine

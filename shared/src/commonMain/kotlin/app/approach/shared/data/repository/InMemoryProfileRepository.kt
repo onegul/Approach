@@ -11,7 +11,7 @@ class InMemoryProfileRepository(
 ) : ProfileRepository {
     private val profile = MutableStateFlow(initialProfile)
 
-    override fun observeProfile(): Flow<UserProfile?> {
+    override fun getProfile(): Flow<UserProfile?> {
         return profile.asStateFlow()
     }
 
