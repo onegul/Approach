@@ -44,13 +44,15 @@ kotlin {
             implementation(libs.lifecycle.runtime.compose)
             implementation(libs.sqlite.bundled)
             implementation(libs.room.runtime)
+            implementation(libs.coroutines.core)
         }
         androidMain.dependencies {
             api(libs.activity.compose)
             implementation(libs.compose.ui.tooling.preview)
         }
         commonTest.dependencies {
-
+            implementation(kotlin("test"))
+            implementation(libs.coroutines.test)
         }
     }
 }
