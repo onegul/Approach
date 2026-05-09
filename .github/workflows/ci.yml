@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   android:
-    name: Android and shared checks
+    name: Android build and tests
     runs-on: ubuntu-latest
 
     steps:
@@ -33,6 +33,9 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v5
+
+      - name: Run shared tests
+        run: ./gradlew :shared:allTests
 
       - name: Build Android debug app
         run: ./gradlew :androidApp:assembleDebug
