@@ -29,6 +29,7 @@ import app.approach.shared.core.model.NearbyPeer
 fun DiscoveryScreen(
     uiState: DiscoveryUiState,
     onBroadcastingChange: (Boolean) -> Unit,
+    onEditProfileClick: () -> Unit,
     onResetProfileClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -47,6 +48,7 @@ fun DiscoveryScreen(
                     displayName = uiState.profile.displayName,
                     isBroadcasting = uiState.isBroadcasting,
                     onBroadcastingChange = onBroadcastingChange,
+                    onEditProfileClick = onEditProfileClick,
                     onResetProfileClick = onResetProfileClick
                 )
             }
@@ -72,6 +74,7 @@ private fun DiscoveryHeader(
     displayName: String,
     isBroadcasting: Boolean,
     onBroadcastingChange: (Boolean) -> Unit,
+    onEditProfileClick: () -> Unit,
     onResetProfileClick: () -> Unit
 ) {
     Column(
@@ -90,6 +93,11 @@ private fun DiscoveryHeader(
             text = "Hi, $displayName. Choose when your public profile is visible to nearby people.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        ApproachOutlineButton(
+            text = "Edit profile",
+            onClick = onEditProfileClick
         )
 
         ApproachOutlineButton(

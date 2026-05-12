@@ -9,7 +9,8 @@ import androidx.compose.ui.unit.dp
 import app.approach.shared.core.model.UserProfile
 
 @Composable
-fun ProfileSetupScreen(
+fun ProfileEditScreen(
+    profile: UserProfile,
     onSaveProfile: (UserProfile) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -17,10 +18,10 @@ fun ProfileSetupScreen(
         modifier = modifier.fillMaxSize()
     ) {
         ProfileEditor(
-            title = "Create your local profile",
-            description = "This stays on your device. You choose what nearby people can see.",
-            buttonText = "Save profile",
-            initialProfile = null,
+            title = "Edit profile",
+            description = "Update what nearby people can see when you broadcast",
+            buttonText = "Save changes",
+            initialProfile = profile,
             onSaveProfile = onSaveProfile,
             modifier = Modifier
                 .fillMaxSize()

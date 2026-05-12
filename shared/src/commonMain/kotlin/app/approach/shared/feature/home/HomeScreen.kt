@@ -12,6 +12,7 @@ fun HomeScreen(
     nearbyPeers: List<NearbyPeer>,
     isBroadcasting: Boolean,
     onBroadcastingChange: (Boolean) -> Unit,
+    onEditProfileClick: () -> Unit,
     onResetProfileClick: () -> Unit
 ) {
     DiscoveryScreen(
@@ -21,6 +22,7 @@ fun HomeScreen(
             isBroadcasting = isBroadcasting
         ),
         onBroadcastingChange = onBroadcastingChange,
+        onEditProfileClick = onEditProfileClick,
         onResetProfileClick = onResetProfileClick
     )
 }
