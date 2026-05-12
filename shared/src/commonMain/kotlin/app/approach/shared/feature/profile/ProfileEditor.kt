@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.approach.shared.core.designsystem.component.ApproachButton
+import app.approach.shared.core.designsystem.component.ApproachOutlineButton
 import app.approach.shared.core.model.AvatarColor
 import app.approach.shared.core.model.UserProfile
 
@@ -35,8 +36,9 @@ fun ProfileEditor(
     title: String,
     description: String,
     buttonText: String,
-    initialProfile: UserProfile?,
+    initialProfile: UserProfile? = null,
     onSaveProfile: (UserProfile) -> Unit,
+    onBackClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val nameState = rememberTextFieldState(initialProfile?.displayName.orEmpty())
@@ -116,5 +118,11 @@ fun ProfileEditor(
             },
             enabled = nameState.text.isNotBlank()
         )
+
+        if (onBackClick != null)
+            ApproachOutlineButton(
+                text = "Cancel",
+                onClick = onBackClick
+            )
     }
 }
