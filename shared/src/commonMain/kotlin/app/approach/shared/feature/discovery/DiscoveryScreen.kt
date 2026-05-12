@@ -20,15 +20,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import app.approach.shared.core.designsystem.component.ApproachButton
 import app.approach.shared.core.designsystem.component.ApproachOutlineButton
 import app.approach.shared.core.designsystem.component.StatusPill
 import app.approach.shared.core.model.DistanceHint
 import app.approach.shared.core.model.NearbyPeer
+import app.approach.shared.core.model.NearbyPermissionState
 
 @Composable
 fun DiscoveryScreen(
     uiState: DiscoveryUiState,
     onBroadcastingChange: (Boolean) -> Unit,
+    onRequestPermissionClick: () -> Unit,
     onEditProfileClick: () -> Unit,
     onResetProfileClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -47,7 +50,9 @@ fun DiscoveryScreen(
                 DiscoveryHeader(
                     displayName = uiState.profile.displayName,
                     isBroadcasting = uiState.isBroadcasting,
+                    permissionState = uiState.permissionState,
                     onBroadcastingChange = onBroadcastingChange,
+                    onRequestPermissionClick = onRequestPermissionClick,
                     onEditProfileClick = onEditProfileClick,
                     onResetProfileClick = onResetProfileClick
                 )
@@ -73,16 +78,42 @@ fun DiscoveryScreen(
 private fun DiscoveryHeader(
     displayName: String,
     isBroadcasting: Boolean,
+    permissionState: NearbyPermissionState,
     onBroadcastingChange: (Boolean) -> Unit,
+    onRequestPermissionClick: () -> Unit,
     onEditProfileClick: () -> Unit,
     onResetProfileClick: () -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        StatusPill(
-            text = if (isBroadcasting) "Broadcasting locally" else "Not broadcasting"
-        )
+        when (permissionState) {
+            NearbyPermissionState.Granted ->
+                StatusPill(
+                    text = if (isBroadcasting) "Broadcasting locally" else "Not broadcasting"
+                )
+
+            NearbyPermissionState.Unknown,
+            NearbyPermissionState.Denied ->
+                ApproachButton(
+                    text = "Allow nearby discovery",
+                    onClick = onRequestPermissionClick
+                )
+
+            NearbyPermissionState.PermanentlyDenied ->
+                Text(
+                    text = "Nearby discovery permission is disabled. Enable it in system settings.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error
+                )
+
+            NearbyPermissionState.Unavailable ->
+                Text(
+                    text = "Nearby discovery is not available on this device.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error
+                )
+        }
 
         Text(
             text = "Nearby",
@@ -134,7 +165,8 @@ private fun DiscoveryHeader(
 
                 Switch(
                     checked = isBroadcasting,
-                    onCheckedChange = onBroadcastingChange
+                    onCheckedChange = onBroadcastingChange,
+                    enabled = permissionState == NearbyPermissionState.Granted
                 )
             }
         }
