@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.approach.shared.core.designsystem.theme.ApproachTheme
+import app.approach.shared.core.model.NearbyPermissionState
 import app.approach.shared.core.navigation.AppDestination
 import app.approach.shared.core.navigation.rememberAppNavigator
 import app.approach.shared.feature.home.HomeScreen
@@ -37,6 +38,10 @@ private fun AppContent() {
         .observeProfileUseCase()
         .collectAsStateWithLifecycle(initialValue = null)
 
+    val permissionState by appContainer
+        .observeNearbyPermissionStateUseCase()
+        .collectAsStateWithLifecycle(initialValue = NearbyPermissionState.Unknown)
+
     val nearbyPeers by appContainer
         .observeNearbyPeersUseCase()
         .collectAsStateWithLifecycle(initialValue = emptyList())
@@ -62,12 +67,18 @@ private fun AppContent() {
                 profile = currentProfile,
                 nearbyPeers = nearbyPeers,
                 isBroadcasting = isBroadcasting,
+                permissionState = permissionState,
                 onBroadcastingChange = { shouldBroadcast ->
                     coroutineScope.launch {
                         if (shouldBroadcast)
                             appContainer.startBroadcastUseCase(currentProfile)
                         else
                             appContainer.stopBroadcastUseCase()
+                    }
+                },
+                onRequestPermissionClick = {
+                    coroutineScope.launch {
+                        appContainer.requestNearbyPermissionUseCase()
                     }
                 },
                 onEditProfileClick = {

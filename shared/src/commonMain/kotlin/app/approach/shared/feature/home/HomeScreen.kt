@@ -2,6 +2,7 @@ package app.approach.shared.feature.home
 
 import androidx.compose.runtime.Composable
 import app.approach.shared.core.model.NearbyPeer
+import app.approach.shared.core.model.NearbyPermissionState
 import app.approach.shared.core.model.UserProfile
 import app.approach.shared.feature.discovery.DiscoveryScreen
 import app.approach.shared.feature.discovery.DiscoveryUiState
@@ -11,7 +12,9 @@ fun HomeScreen(
     profile: UserProfile,
     nearbyPeers: List<NearbyPeer>,
     isBroadcasting: Boolean,
+    permissionState: NearbyPermissionState,
     onBroadcastingChange: (Boolean) -> Unit,
+    onRequestPermissionClick: () -> Unit,
     onEditProfileClick: () -> Unit,
     onResetProfileClick: () -> Unit
 ) {
@@ -19,9 +22,11 @@ fun HomeScreen(
         uiState = DiscoveryUiState(
             profile = profile,
             nearbyPeers = nearbyPeers,
-            isBroadcasting = isBroadcasting
+            isBroadcasting = isBroadcasting,
+            permissionState = permissionState
         ),
         onBroadcastingChange = onBroadcastingChange,
+        onRequestPermissionClick = onRequestPermissionClick,
         onEditProfileClick = onEditProfileClick,
         onResetProfileClick = onResetProfileClick
     )
