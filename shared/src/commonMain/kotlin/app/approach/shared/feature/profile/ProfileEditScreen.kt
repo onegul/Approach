@@ -12,6 +12,7 @@ import app.approach.shared.core.model.UserProfile
 fun ProfileEditScreen(
     profile: UserProfile,
     onSaveProfile: (UserProfile) -> Unit,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -23,6 +24,7 @@ fun ProfileEditScreen(
             buttonText = "Save changes",
             initialProfile = profile,
             onSaveProfile = onSaveProfile,
+            onBackClick = onBackClick,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)

@@ -20,7 +20,6 @@ fun ProfileSetupScreen(
             title = "Create your local profile",
             description = "This stays on your device. You choose what nearby people can see.",
             buttonText = "Save profile",
-            initialProfile = null,
             onSaveProfile = onSaveProfile,
             modifier = Modifier
                 .fillMaxSize()

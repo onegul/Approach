@@ -3,12 +3,12 @@ package app.approach.shared
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.approach.shared.core.designsystem.theme.ApproachTheme
+import app.approach.shared.core.navigation.AppDestination
+import app.approach.shared.core.navigation.rememberAppNavigator
 import app.approach.shared.feature.home.HomeScreen
 import app.approach.shared.feature.profile.ProfileEditScreen
 import app.approach.shared.feature.profile.ProfileSetupScreen
@@ -29,6 +29,7 @@ fun App(
 
 @Composable
 private fun AppContent() {
+    val navigator = rememberAppNavigator()
     val appContainer = LocalAppContainer.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -44,8 +45,6 @@ private fun AppContent() {
         .observeBroadcastingStateUseCase()
         .collectAsStateWithLifecycle(initialValue = false)
 
-    var currentScreen by remember { mutableStateOf(AppScreen.Home) }
-
     val currentProfile = profile
 
     if (currentProfile == null)
@@ -53,12 +52,13 @@ private fun AppContent() {
             onSaveProfile = { profile ->
                 coroutineScope.launch {
                     appContainer.saveProfileUseCase(profile)
+                    navigator.replace(AppDestination.Home)
                 }
             }
         )
     else
-        when (currentScreen) {
-            AppScreen.Home -> HomeScreen(
+        when (navigator.currentDestination) {
+            AppDestination.Home -> HomeScreen(
                 profile = currentProfile,
                 nearbyPeers = nearbyPeers,
                 isBroadcasting = isBroadcasting,
@@ -71,29 +71,28 @@ private fun AppContent() {
                     }
                 },
                 onEditProfileClick = {
-                    currentScreen = AppScreen.EditProfile
+                    navigator.navigate(AppDestination.EditProfile)
                 },
                 onResetProfileClick = {
                     coroutineScope.launch {
                         appContainer.stopBroadcastUseCase()
                         appContainer.clearProfileUseCase()
+                        navigator.replace(AppDestination.Home)
                     }
                 }
             )
 
-            AppScreen.EditProfile -> ProfileEditScreen(
+            AppDestination.EditProfile -> ProfileEditScreen(
                 profile = currentProfile,
                 onSaveProfile = { updatedProfile ->
                     coroutineScope.launch {
                         appContainer.saveProfileUseCase(updatedProfile)
-                        currentScreen = AppScreen.Home
+                        navigator.navigateBack()
                     }
+                },
+                onBackClick = {
+                    navigator.navigateBack()
                 }
             )
         }
-}
-
-private enum class AppScreen {
-    Home,
-    EditProfile
 }
