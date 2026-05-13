@@ -18,24 +18,24 @@ import app.approach.shared.domain.usecase.StartBroadcastUseCase
 import app.approach.shared.domain.usecase.StopBroadcastUseCase
 
 class AppContainer(
-    profileRepository: ProfileRepository = InMemoryProfileRepository()
+    profileRepository: ProfileRepository = InMemoryProfileRepository(),
+    nearbyPermissionController: NearbyPermissionController = FakeNearbyPermissionController()
 ) {
-    private val nearbyPermissionController: NearbyPermissionController =
-        FakeNearbyPermissionController()
     private val nearbyDiscoveryEngine = FakeNearbyDiscoveryEngine()
 
     val nearbyScanner: NearbyScanner = nearbyDiscoveryEngine
     val nearbyBroadcaster: NearbyBroadcaster = nearbyDiscoveryEngine
 
+    val observeProfileUseCase = ObserveProfileUseCase(profileRepository)
+    val saveProfileUseCase = SaveProfileUseCase(profileRepository)
+    val clearProfileUseCase = ClearProfileUseCase(profileRepository)
+    
     val observeNearbyPermissionStateUseCase =
         ObserveNearbyPermissionStateUseCase(nearbyPermissionController)
     val requestNearbyPermissionUseCase = RequestNearbyPermissionUseCase(nearbyPermissionController)
+
     val observeNearbyPeersUseCase = ObserveNearbyPeersUseCase(nearbyScanner)
     val observeBroadcastingStateUseCase = ObserveBroadcastingStateUseCase(nearbyBroadcaster)
     val startBroadcastUseCase = StartBroadcastUseCase(nearbyBroadcaster)
     val stopBroadcastUseCase = StopBroadcastUseCase(nearbyBroadcaster)
-
-    val observeProfileUseCase = ObserveProfileUseCase(profileRepository)
-    val saveProfileUseCase = SaveProfileUseCase(profileRepository)
-    val clearProfileUseCase = ClearProfileUseCase(profileRepository)
 }
