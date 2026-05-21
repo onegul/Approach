@@ -24,6 +24,7 @@ import app.approach.shared.core.designsystem.component.ApproachButton
 import app.approach.shared.core.designsystem.component.ApproachOutlineButton
 import app.approach.shared.core.designsystem.component.StatusPill
 import app.approach.shared.core.model.DistanceHint
+import app.approach.shared.core.model.NearbyCapabilityState
 import app.approach.shared.core.model.NearbyPeer
 import app.approach.shared.core.model.NearbyPermissionState
 
@@ -50,6 +51,7 @@ fun DiscoveryScreen(
                 DiscoveryHeader(
                     displayName = uiState.profile.displayName,
                     isBroadcasting = uiState.isBroadcasting,
+                    capabilityState = uiState.capabilityState,
                     permissionState = uiState.permissionState,
                     onBroadcastingChange = onBroadcastingChange,
                     onRequestPermissionClick = onRequestPermissionClick,
@@ -79,41 +81,29 @@ private fun DiscoveryHeader(
     displayName: String,
     isBroadcasting: Boolean,
     permissionState: NearbyPermissionState,
+    capabilityState: NearbyCapabilityState,
     onBroadcastingChange: (Boolean) -> Unit,
     onRequestPermissionClick: () -> Unit,
     onEditProfileClick: () -> Unit,
     onResetProfileClick: () -> Unit
 ) {
+    val canBroadcast =
+        permissionState == NearbyPermissionState.Granted &&
+                capabilityState == NearbyCapabilityState.Available
+
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        when (permissionState) {
-            NearbyPermissionState.Granted ->
-                StatusPill(
-                    text = if (isBroadcasting) "Broadcasting locally" else "Not broadcasting"
-                )
-
-            NearbyPermissionState.Unknown,
-            NearbyPermissionState.Denied ->
-                ApproachButton(
-                    text = "Allow nearby discovery",
-                    onClick = onRequestPermissionClick
-                )
-
-            NearbyPermissionState.PermanentlyDenied ->
-                Text(
-                    text = "Nearby discovery permission is disabled. Enable it in system settings.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error
-                )
-
-            NearbyPermissionState.Unavailable ->
-                Text(
-                    text = "Nearby discovery is not available on this device.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error
-                )
-        }
+        StatusPill(
+            text = when {
+                isBroadcasting -> "Broadcasting locally"
+                canBroadcast -> "Ready for local discovery"
+                permissionState != NearbyPermissionState.Granted -> "Permission needed"
+                capabilityState == NearbyCapabilityState.BluetoothDisabled -> "Bluetooth off"
+                capabilityState == NearbyCapabilityState.BluetoothUnavailable -> "Bluetooth unavailable"
+                else -> "Checking nearby discovery"
+            }
+        )
 
         Text(
             text = "Nearby",
@@ -126,14 +116,10 @@ private fun DiscoveryHeader(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        ApproachOutlineButton(
-            text = "Edit profile",
-            onClick = onEditProfileClick
-        )
-
-        ApproachOutlineButton(
-            text = "Reset profile",
-            onClick = onResetProfileClick
+        NearbyReadinessMessage(
+            permissionState = permissionState,
+            capabilityState = capabilityState,
+            onRequestPermissionClick = onRequestPermissionClick
         )
 
         Card(
@@ -156,6 +142,7 @@ private fun DiscoveryHeader(
                         text = "Broadcast profile",
                         style = MaterialTheme.typography.titleMedium
                     )
+
                     Text(
                         text = "Use local device discovery only.",
                         style = MaterialTheme.typography.bodySmall,
@@ -166,11 +153,108 @@ private fun DiscoveryHeader(
                 Switch(
                     checked = isBroadcasting,
                     onCheckedChange = onBroadcastingChange,
-                    enabled = permissionState == NearbyPermissionState.Granted
+                    enabled = canBroadcast
                 )
             }
         }
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            ApproachOutlineButton(
+                text = "Edit profile",
+                onClick = onEditProfileClick,
+                modifier = Modifier.weight(1f)
+            )
+
+            ApproachOutlineButton(
+                text = "Reset profile",
+                onClick = onResetProfileClick,
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
+}
+
+@Composable
+private fun NearbyReadinessMessage(
+    permissionState: NearbyPermissionState,
+    capabilityState: NearbyCapabilityState,
+    onRequestPermissionClick: () -> Unit
+) {
+    when {
+        permissionState == NearbyPermissionState.Unknown ||
+                permissionState == NearbyPermissionState.Denied -> {
+            ApproachButton(
+                text = "Allow nearby discovery",
+                onClick = onRequestPermissionClick,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        permissionState == NearbyPermissionState.PermanentlyDenied -> {
+            ReadinessText(
+                text = "Nearby discovery permission is disabled. Enable it in system settings.",
+                isError = true
+            )
+        }
+
+        permissionState == NearbyPermissionState.Unavailable -> {
+            ReadinessText(
+                text = "Nearby permissions are not available on this device.",
+                isError = true
+            )
+        }
+
+        capabilityState == NearbyCapabilityState.PermissionRequired -> {
+            ApproachButton(
+                text = "Allow nearby discovery",
+                onClick = onRequestPermissionClick,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        capabilityState == NearbyCapabilityState.BluetoothUnavailable -> {
+            ReadinessText(
+                text = "Bluetooth LE is not available on this device.",
+                isError = true
+            )
+        }
+
+        capabilityState == NearbyCapabilityState.BluetoothDisabled -> {
+            ReadinessText(
+                text = "Turn on Bluetooth to use nearby discovery.",
+                isError = false
+            )
+        }
+
+        capabilityState == NearbyCapabilityState.Unknown -> {
+            ReadinessText(
+                text = "Checking nearby discovery capabilities...",
+                isError = false
+            )
+        }
+
+        else -> Unit
+    }
+}
+
+@Composable
+private fun ReadinessText(
+    text: String,
+    isError: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = MaterialTheme.typography.bodyMedium,
+        color = if (isError) {
+            MaterialTheme.colorScheme.error
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        }
+    )
 }
 
 @Composable
